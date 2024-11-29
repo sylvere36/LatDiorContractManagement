@@ -22,12 +22,24 @@ object ServiceVente {
 
     def extractDateEndContratVille(): DataFrame = {
       val schema_MetaTransaction = new StructType()
-        .add("Ville", StringType, false)
-        .add("Date_End_contrat", StringType, false)
+        .add("Ville", StringType, true)
+        .add("Date_End_contrat", StringType, true)
+        .add("TypeProd", StringType, true)
+        .add("produit", ArrayType(StringType, true), true)
+
       val schema = new StructType()
         .add("MetaTransaction", ArrayType(schema_MetaTransaction), true)
 
-      dataFrame.withColumn("MetaData", from_json(col("MetaData"), schema))
+      val metaDataColumn = dataFrame.schema.fields.find(_.name == "MetaData")
+
+      val updatedDataFrame = metaDataColumn match {
+        case Some(field) if field.dataType == StringType =>
+          dataFrame.withColumn("MetaData", from_json(col("MetaData"), schema))
+        case _ =>
+          dataFrame
+      }
+
+      updatedDataFrame
         .withColumn("Date_End_contrat", expr("MetaData.MetaTransaction[0].Date_End_contrat"))
         .withColumn("Ville", expr("MetaData.MetaTransaction[0].Ville"))
         .drop("MetaData")

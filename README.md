@@ -1,6 +1,6 @@
 # Projet Spark - Service Vente
 
-Ce projet utilise Apache Spark pour manipuler et analyser des données de vente. Les différentes étapes du traitement incluent la lecture des données à partir de divers formats (CSV, JSON), des transformations pour préparer les données, et des tests unitaires pour vérifier la précision des transformations appliquées.
+Ce projet utilise Scala pour manipuler et analyser des données de vente. Les différentes étapes du traitement incluent la lecture des données à partir de divers formats (CSV, JSON), des transformations pour préparer les données, et des tests unitaires pour vérifier la précision des transformations appliquées.
 
 ## Structure du Projet
 
@@ -35,7 +35,7 @@ Ce projet utilise Apache Spark pour manipuler et analyser des données de vente.
 
 ### Prérequis
 - **Java** : JDK 8 ou supérieur doit être installé.
-- **Apache Spark** : Le projet est basé sur Apache Spark, assurez-vous qu'il est correctement installé.
+- **Scala** : Le projet est basé sur Scala, assurez-vous qu'il est correctement installé.
 - **SBT** : Utilisé pour la compilation et la gestion des dépendances.
 
 ### Étapes d'Installation
