@@ -1,22 +1,27 @@
 package sda.reader
 
 import org.apache.spark.sql.SparkSession
-import org.scalatest.funsuite.AnyFunSuite
-import org.apache.spark.sql.Row
 import org.apache.spark.sql.types._
+import org.scalatest.BeforeAndAfter
+import org.scalatest.funsuite.AnyFunSuite
 
-class CsvReaderTest extends AnyFunSuite {
+class CsvReaderTest extends AnyFunSuite with BeforeAndAfter {
 
   // Configuration SparkSession pour les tests
-  implicit val spark: SparkSession = SparkSession.builder()
-    .appName("CsvReaderTest")
-    .master("local[*]")
-    .getOrCreate()
+  implicit var spark: SparkSession = _
+
+  // Initialisation de SparkSession avant chaque test
+  before {
+    spark = SparkSession.builder()
+      .appName("CsvReaderTest")
+      .master("local[*]")
+      .getOrCreate()
+  }
 
   // Test de lecture du fichier CSV
   test("CsvReader should read CSV file correctly") {
     // Données CSV d'exemple
-    val csvPath = "src/test/resources/data.csv"
+    val csvPath = "src/main/resources/DataforTest/data.csv"
 
     // Création d'une instance de CsvReader
     val csvReader = CsvReader(csvPath, Some("#"), Some(true))
@@ -41,8 +46,10 @@ class CsvReaderTest extends AnyFunSuite {
     assert(firstRow.getAs[String]("MetaData").contains("MetaTransaction"))
   }
 
-  // Fermeture de la SparkSession après les tests
+  // Fermeture de la SparkSession après chaque test
   after {
-    spark.stop()
+    if (spark != null) {
+      spark.stop()
+    }
   }
 }
