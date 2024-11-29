@@ -17,43 +17,45 @@ object ServiceVente {
 
     def calculTTC(): DataFrame = {
       dataFrame.withColumn("TTC", round(col("HTT") + (col("HTT") * col("TVA")), 2))
-        .drop("TVA", "HTT_TVA")
+        .drop("TVA", "HTT")
     }
 
     def extractDateEndContratVille(): DataFrame = {
       val schema_MetaTransaction = new StructType()
-        .add("Ville", StringType, true)
-        .add("Date_End_contrat", StringType, true)
-        .add("TypeProd", StringType, true)
-        .add("produit", ArrayType(StringType, true), true)
-
+        .add("Ville", StringType, false)
+        .add("Date_End_contrat", StringType, false)
       val schema = new StructType()
         .add("MetaTransaction", ArrayType(schema_MetaTransaction), true)
 
-      val metaDataColumn = dataFrame.schema.fields.find(_.name == "MetaData")
+      dataFrame.withColumn(
+          "ParsedMeta",
+          from_json(col("MetaData"), schema) // Convertir la chaîne JSON 'MetaData' en structure de données selon le schéma défini
+        )
+        .withColumn(
+          "MetaTransaction",
+          explode(col("ParsedMeta.MetaTransaction"))
+        )
+        .withColumn(
+          "Ville",
+          col("MetaTransaction.Ville")
+        )
+        .withColumn(
+          "Date_End_contrat",
+          regexp_extract(col("MetaTransaction.Date_End_contrat"), "\\d{4}-\\d{2}-\\d{2}", 0)
+        )
+        .drop("MetaData", "ParsedMeta", "MetaTransaction", "HTT_TVA")
+        .filter(col("Ville").isNotNull)
 
-      val updatedDataFrame = metaDataColumn match {
-        case Some(field) if field.dataType == StringType =>
-          dataFrame.withColumn("MetaData", from_json(col("MetaData"), schema))
-        case _ =>
-          dataFrame
-      }
-
-      updatedDataFrame
-        .withColumn("Date_End_contrat", expr("MetaData.MetaTransaction[0].Date_End_contrat"))
-        .withColumn("Ville", expr("MetaData.MetaTransaction[0].Ville"))
-        .drop("MetaData")
     }
 
     def contratStatus(): DataFrame = {
       dataFrame.withColumn(
         "Contrat_Status",
         when(
-          to_timestamp(col("Date_End_contrat"), "yyyy-MM-dd HH:mm:ss").lt(current_timestamp()),
+          to_timestamp(col("Date_End_contrat"), "yyyy-MM-dd").lt(current_timestamp()),
           "Expired"
         ).otherwise("Actif")
-      )
+      ).drop("HTT_TVA")
     }
   }
-
 }

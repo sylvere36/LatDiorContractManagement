@@ -9,13 +9,9 @@ class JsonReader(path: String)
     val format = "json"
 
     def read()(implicit spark: SparkSession): DataFrame = {
-      val rawDf = spark.read.format(format)
+      spark.read.format(format)
         .option("multiline", true)
         .load(path)
-
-      rawDf.withColumn("HTT", split(col("HTT_TVA"), "\\|").getItem(0).cast("double"))
-        .withColumn("TVA", split(col("HTT_TVA"), "\\|").getItem(1).cast("double"))
-        .withColumn("MetaData", from_json(col("MetaData"), getMetaDataSchema()))
     }
 
     private def getMetaDataSchema() = {

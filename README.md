@@ -62,5 +62,8 @@ Le point d'entrée principal du projet est la classe `MainBatch`. Elle utilise l
 Les contributions sont les bienvenues. Si vous souhaitez ajouter des fonctionnalités ou corriger des bogues, merci de créer une branche à partir de `main` et de soumettre une Pull Request.
 
 ## Auteur
-- **AKAMBI OLOUWASHEGUN SYLVRE** - Étudiant à UNCHK
+- **AKAMBI Olouwashegun Sylvère** 
+- **OUOBA Kampari Diomède**
+- **Oumou Kadija Goudiaby** 
+- **Esso-Lizam ASSOTI**
 
